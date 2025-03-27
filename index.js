@@ -23,21 +23,28 @@ const logger = (req, res, next) => {
 
 // verify the token 
 const verifyToken = (req, res, next) => {
-    console.log('inside the verify token');
-    const token = req?.cookies?.token;
 
-    if (!token) {
-        return res.status(401).send("UnAuthorize Access")
-    }
 
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-        if (err) {
-            return res.status(401).send({ message: 'UnAuthorize Access' })
-        }
-        req.user = decoded;
 
-        next();
-    })
+
+
+
+    // ------------------------------------------
+    // console.log('inside the verify token');
+    // const token = req?.cookies?.token;
+
+    // if (!token) {
+    //     return res.status(401).send("UnAuthorize Access")
+    // }
+
+    // jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+    //     if (err) {
+    //         return res.status(401).send({ message: 'UnAuthorize Access' })
+    //     }
+    //     req.user = decoded;
+
+    //     next();
+    // })
 
 }
 
@@ -74,6 +81,14 @@ async function run() {
                     secure: false,
 
                 })
+                .send({ success: true })
+        })
+
+        app.post('/logout', (req, res) => {
+            res.clearCookie('token', {
+                httpOnly: true,
+                secure: false,
+            })
                 .send({ success: true })
         })
 
