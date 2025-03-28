@@ -24,9 +24,38 @@ const logger = (req, res, next) => {
 // verify the token 
 const verifyToken = (req, res, next) => {
 
+    const token = req.cookies?.token;
 
+    if (!token) {
+        return res.status(401).send({ message: "Unauthorized access" })
+    }
 
+    // if token available -> verify the token 
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(401).send({ message: 'Unauthorized access' })
+        }
+        req.user = decoded;
 
+        next();
+
+    })
+
+    // if (!token) {
+    //     return res.status(401).send({ message: 'Unauthorized access' })
+    // }
+
+    // // if token is available  -> then verify the token
+    // jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) =>{
+    //     if (err) {
+    //         return res.status(401).send({ message: 'Unauthorized access' })
+    //     }
+
+    //     req.user = decoded;
+
+    // next();
+
+    // })
 
 
     // ------------------------------------------
@@ -97,7 +126,7 @@ async function run() {
         const jobsCollection = client.db('jobPortal').collection('jobs');
         const jobApplicationCollection = client.db('jobPortal').collection('job_application');
 
-        app.get('/jobs', logger, async (req, res) => {
+        app.get('/jobs', async (req, res) => {
             const email = req.query.email;
             let query = {};
             if (email) {
@@ -134,7 +163,7 @@ async function run() {
             const email = req.query.email;
             const query = { applicant_email: email };
 
-            if (req.user.email !== req.query.email) {
+            if (req.user?.email !== req.query?.email) {
                 return res.status(403).send({ message: 'forbidden access' })
             }
 
